@@ -459,72 +459,21 @@ public class GameSceneDirector : MonoBehaviour
     // 移動後の処理
    void statusUpdateMode()
     {
-        // キャスリング（特殊能力の処理）
-        if(selectUnit.Status.Contains(UnitController.STATUS.QSIDE_CASTLING) )
-        {
-            // 左端のルーク
-            UnitController unit = units[0, selectUnit.Pos.y];
-            Vector2Int tile = new Vector2Int(selectUnit.Pos.x + 1, selectUnit.Pos.y);
-
-            moveUnit(unit, tile);
-        }
-        else if (selectUnit.Status.Contains(UnitController.STATUS.KSIDE_CASTLING))
-        {
-            // 右端のルーク
-            UnitController unit = units[TILE_X-1, selectUnit.Pos.y];
-            Vector2Int tile = new Vector2Int(selectUnit.Pos.x - 1, selectUnit.Pos.y);
-
-            moveUnit(unit, tile);
-        }
-
-        // アンパッサンとプロモーション
-        if (UnitController.TYPE.PAWN == selectUnit.Type)
-        {
-            foreach (var v in getUnits(getNextPlayer()))
-            {
-                if (!v.Status.Contains(UnitController.STATUS.EN_PASSANT)) continue;
-
-                // 置いた場所がアンパッサン対象か
-                if(selectUnit.Pos == v.OldPos)
-                {
-                    Destroy(v.gameObject);
-                }
-            }
-
-            // プロモーション
-            int py = TILE_Y - 1;
-            if (selectUnit.Player == 1) py = 0;
-
-            // 端に到達
-            if( py == selectUnit.Pos.y )
-            {
-                // クイーン固定
-                GameObject prefab = getPrefabUnit(nowPlayer, (int)UnitController.TYPE.QUEEN);
-                UnitController unit = Instantiate(prefab).GetComponent<UnitController>();
-                GameObject tile = tiles[selectUnit.Pos.x, selectUnit.Pos.y];
-
-                unit.SetUnit(selectUnit.Player, UnitController.TYPE.QUEEN, tile);
-                moveUnit(unit, new Vector2Int(selectUnit.Pos.x, selectUnit.Pos.y));
-            }
-        }
+        
 
         
 
 
 
 
-        // ターン経過
-        foreach (var v in getUnits(nowPlayer))
-        {
-            v.ProgressTurn();
-        }
+        
 
         // カーソル
         setSelectCursors();
 
         
         
-        nextMode = MODE.TURN_CHANGE;
+        
         
         
         
