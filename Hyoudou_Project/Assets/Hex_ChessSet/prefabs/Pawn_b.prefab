@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: -8191419667176062953}
   m_Layer: 0
   m_Name: Pawn_b
-  m_TagString: heiminn
+  m_TagString: BHK
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

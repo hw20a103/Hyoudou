@@ -19,6 +19,11 @@ public class GameSceneDirector : MonoBehaviour
 
     // タイルのプレハブ
     public GameObject[] prefabTile;
+
+
+    // タイルのプレハブ追加　特殊タイル。
+    public GameObject[] prefabTile2;
+
     // カーソルのプレハブ
     public GameObject prefabCursor;
 
@@ -30,15 +35,17 @@ public class GameSceneDirector : MonoBehaviour
     public List<GameObject> prefabWhiteUnits;
     public List<GameObject> prefabBlackUnits;
 
+
+
     // 1 = ポーン(平民) 2 = ルーク（貴族） 3 = ナイト（英雄） 4 = ビショップ 5 = クイーン 6 = キング（王様）
     //
     //ここで湧いて来る駒を設定している。
     public int[,] unitType =
     {
-        
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+
+        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0},
+        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0},
+        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0},
         { 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 12 },
         { 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 12 },
         { 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 12 },
@@ -48,10 +55,10 @@ public class GameSceneDirector : MonoBehaviour
         { 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 12 },
         { 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 12 },
         { 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 12 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        
+        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0},
+        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0},
+        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0},
+
 
     };
 
@@ -60,13 +67,21 @@ public class GameSceneDirector : MonoBehaviour
     GameObject txtResultInfo;
     GameObject btnApply;
     GameObject btnCancel;
-
+    
     // 選択ユニット
     UnitController selectUnit;
 
     // 移動関連
     List<Vector2Int> movableTiles;
     List<GameObject> cursors;
+
+    //指揮力
+    /*public int sikiryoku;
+    public Text txtsikinouyoku;
+
+    public int sikiryoku2;
+    public Text txtsikinouyoku2;
+    */
 
     // モード
     enum MODE
@@ -89,9 +104,16 @@ public class GameSceneDirector : MonoBehaviour
     List<UnitController[,]> prevUnits;
 
 
+    //移動した時のフラグを作る。
+
+
+
     // Start is called before the first frame update
     void Start()
     {
+        
+
+
         // UIオブジェクト取得
         txtTurnInfo = GameObject.Find("TextTurnInfo");
         txtResultInfo = GameObject.Find("TextResultInfo");
@@ -108,21 +130,28 @@ public class GameSceneDirector : MonoBehaviour
         cursors = new List<GameObject>();
         prevUnits = new List<UnitController[,]>();
 
-        for (int i = 0; i < TILE_X; i++)
+        //タイルの生成とユニットの生成 二重ループ。
+        for (int i = 0; i < TILE_X; i++)//横のデータ。
         {
-            for (int j = 0; j < TILE_Y; j++)
+            for (int j = 0; j < TILE_Y; j++)//縦のデータ
             {
                 // タイルとユニットのポジション
-                float x = i - TILE_X / 2;
+                float x = i - TILE_X / 2;　//半分だけずらす。　ワールドの原点からじゃなくて、真ん中に寄せる。
                 float y = j - TILE_Y / 2;
 
-                Vector3 pos = new Vector3(x, 0, y);
+                Vector3 pos = new Vector3(x, 0, y);　//yをzにしている。
 
-                // 作成
-                int idx = (i + j) % 2;
-                GameObject tile = Instantiate(prefabTile[idx], pos, Quaternion.identity);
+                
+                    
+                
+                
+                    // 作成
+                    int idx = (i + j) % 2;
+                    GameObject tile = Instantiate(prefabTile[idx], pos, Quaternion.identity); //instantiate(プレファブの指定、場所の指定、角度の指定)
 
-                tiles[i, j] = tile;
+                    tiles[i, j] = tile;
+
+                
 
                 // ユニットの作成
                 int type = unitType[i, j] % 10;
@@ -149,6 +178,11 @@ public class GameSceneDirector : MonoBehaviour
         nowPlayer = -1;
         nowMode = MODE.NONE;
         nextMode = MODE.TURN_CHANGE;
+
+
+       
+
+
     }
 
     // Update is called once per frame
@@ -189,6 +223,9 @@ public class GameSceneDirector : MonoBehaviour
             nowMode = nextMode;
             nextMode = MODE.NONE;
         }
+
+        
+
     }
 
     // チェックメイトモード
@@ -243,6 +280,7 @@ public class GameSceneDirector : MonoBehaviour
             nextMode = MODE.RESULT;
         }
 
+        
         // --------------------
         // チェックのチェック
         // --------------------
@@ -275,7 +313,7 @@ public class GameSceneDirector : MonoBehaviour
             tilecount += getMovableTiles(v).Count;
         }
 
-        // 動かせない
+        // 動かせない　
         if( 1 > tilecount )
         {
             info.text = "ステイルメイト\n" + "引き分け";
@@ -326,31 +364,38 @@ public class GameSceneDirector : MonoBehaviour
         while( TitleSceneDirector.PlayerCount <= nowPlayer
                 && (null == selectUnit || null == tile ) )
         {
-            // ユニット選択
-            if( null == selectUnit)
-            {
-                // 今回の全ユニット
-                List<UnitController> tmpunits = getUnits(nowPlayer);
-                // ランダムで1体選ぶ
-                UnitController tmp = tmpunits[Random.Range(0, tmpunits.Count)];
-                // ユニットがいるタイルを選択
-                tile = tiles[tmp.Pos.x, tmp.Pos.y];
+            
+                // ユニット選択
+                if (null == selectUnit)
+                {
+                    // 今回の全ユニット
+                    List<UnitController> tmpunits = getUnits(nowPlayer);
+                    // ランダムで1体選ぶ
+                    UnitController tmp = tmpunits[Random.Range(0, tmpunits.Count)];
+                    // ユニットがいるタイルを選択
+                    tile = tiles[tmp.Pos.x, tmp.Pos.y];
 
-                // 一旦処理へ流す
-                break;
+                    // 一旦処理へ流す
+                    break;
+                }
+
+                // ここから下はselectUnitが入った状態でくる
+                if (1 > movableTiles.Count)
+                {
+                    setSelectCursors();
+                    break;
+                }
+
+                // 移動可能範囲があればランダムで移動
+                int rnd = Random.Range(0, movableTiles.Count);
+                tile = tiles[movableTiles[rnd].x, movableTiles[rnd].y];
+
+               
+
+
             }
-
-            // ここから下はselectUnitが入った状態でくる
-            if( 1 > movableTiles.Count)
-            {
-                setSelectCursors();
-                break;
-            }
-
-            // 移動可能範囲があればランダムで移動
-            int rnd = Random.Range(0, movableTiles.Count);
-            tile = tiles[movableTiles[rnd].x, movableTiles[rnd].y];
-        }
+           
+        
 
         // タイルが押されていなければ処理しない
         if (null == tile) return;
@@ -363,6 +408,10 @@ public class GameSceneDirector : MonoBehaviour
         // ユニット
         unit = units[tilepos.x, tilepos.y];
 
+
+        
+
+        
         // ユニット選択
         if (null != unit
             && selectUnit != unit
@@ -380,8 +429,22 @@ public class GameSceneDirector : MonoBehaviour
         // 移動
         else if (null != selectUnit && movableTiles.Contains(tilepos))
         {
-            moveUnit(selectUnit, tilepos);
-            nextMode = MODE.STATUS_UPDATE;
+
+                
+                
+                moveUnit(selectUnit, tilepos);
+
+
+
+            //nextMode = MODE.STATUS_UPDATE;
+
+            
+
+
+
+
+
+
         }
         // 移動範囲だけ見られる
         else if( null != unit && nowPlayer != unit.Player)
@@ -393,10 +456,12 @@ public class GameSceneDirector : MonoBehaviour
         {
             setSelectCursors();
         }
+
+        
     }
 
     // 移動後の処理
-    void statusUpdateMode()
+   void statusUpdateMode()
     {
         // キャスリング
         if(selectUnit.Status.Contains(UnitController.STATUS.QSIDE_CASTLING) )
@@ -447,6 +512,11 @@ public class GameSceneDirector : MonoBehaviour
             }
         }
 
+        
+
+
+
+
         // ターン経過
         foreach (var v in getUnits(nowPlayer))
         {
@@ -456,7 +526,12 @@ public class GameSceneDirector : MonoBehaviour
         // カーソル
         setSelectCursors();
 
+        
+        
         nextMode = MODE.TURN_CHANGE;
+        
+        
+        
     }
 
     // ターン変更
@@ -472,9 +547,17 @@ public class GameSceneDirector : MonoBehaviour
         if( 0 == nowPlayer)
         {
             prevDestroyTurn++;
+            
         }
 
         nextMode = MODE.CHECK_MATE;
+    }
+
+    public void tumchangebottnn()
+    {
+        
+
+        turnChangeMode();
     }
 
     int getNextPlayer()
@@ -528,7 +611,7 @@ public class GameSceneDirector : MonoBehaviour
         return ret;
     }
 
-    // 移動可能範囲取得
+    // 移動可能範囲取得　　大切
     List<Vector2Int> getMovableTiles(UnitController unit)
     {
         // そこをどいたらチェックされてしまうか
@@ -614,9 +697,12 @@ public class GameSceneDirector : MonoBehaviour
         if(null != units[tilepos.x, tilepos.y])
         {
             Destroy(units[tilepos.x, tilepos.y].gameObject);
-            prevDestroyTurn = 0;
+            
         }
 
+        
+
+        
         // 新しい場所へ移動
         unit.MoveUnit(tiles[tilepos.x, tilepos.y]);
 
@@ -666,6 +752,14 @@ public class GameSceneDirector : MonoBehaviour
 
         return ret;
     }
+
+    
+
+    
+
+
+
+
 
     public void Retry()
     {

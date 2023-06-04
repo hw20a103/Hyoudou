@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: -1433347533292861013}
   m_Layer: 0
   m_Name: King_w
-  m_TagString: king
+  m_TagString: Bkizoku
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

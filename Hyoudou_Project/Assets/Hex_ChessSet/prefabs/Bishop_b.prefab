@@ -75,6 +75,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3a957732183e4ca488146d65cf26a74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Player: 0
+  Type: 0
+  ProgressTurnCount: 0
+  Pos: {x: 0, y: 0}
+  OldPos: {x: 0, y: 0}
+  Status: 
 --- !u!1 &5270857973137358596
 GameObject:
   m_ObjectHideFlags: 0

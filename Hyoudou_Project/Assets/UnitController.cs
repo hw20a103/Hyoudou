@@ -8,12 +8,11 @@ public class UnitController : MonoBehaviour
     public int Player;
 
 
-    //ユニット変数（平民＝H、貴族＝K、　英雄＝E、王様＝O）
 
-    int H = 0;
-    int K = 0;
-    int E = 0;
-    int O = 0;
+
+
+    
+    
 
 
     // ユニットの種類
@@ -45,6 +44,8 @@ public class UnitController : MonoBehaviour
         KSIDE_CASTLING,
         EN_PASSANT,
         CHECK,
+        
+
     }
 
     // Start is called before the first frame update
@@ -66,6 +67,8 @@ public class UnitController : MonoBehaviour
         Type = type;
         MoveUnit(tile);
         ProgressTurnCount = -1; // 初期状態に戻す
+
+        
     }
 
     // 移動可能範囲取得
@@ -74,18 +77,18 @@ public class UnitController : MonoBehaviour
         List<Vector2Int> ret = new List<Vector2Int>();
 
         // クイーン
-        if( TYPE.QUEEN == Type)
+        if (TYPE.QUEEN == Type)
         {
             // ルークとビショップの動きを合成
             ret = getMovableTiles(units, TYPE.ROOK);
 
-            foreach (var v in getMovableTiles(units,TYPE.BISHOP))
+            foreach (var v in getMovableTiles(units, TYPE.BISHOP))
             {
                 if (!ret.Contains(v)) ret.Add(v);
 
             }
         }
-        else if( TYPE.KING == Type)
+        else if (TYPE.KING == Type)
         {
             ret = getMovableTiles(units, TYPE.KING);
 
@@ -100,8 +103,8 @@ public class UnitController : MonoBehaviour
             {
                 // 移動した状態を作る
                 UnitController[,] copyunits2 = GameSceneDirector.GetCopyArray(units);
-                copyunits2[Pos.x, Pos.y]    = null;
-                copyunits2[v.x, v.y]        = this;
+                copyunits2[Pos.x, Pos.y] = null;
+                copyunits2[v.x, v.y] = this;
 
                 int checkcount = GameSceneDirector.GetCheckUnits(copyunits2, Player, false).Count;
 
@@ -121,7 +124,7 @@ public class UnitController : MonoBehaviour
                 int cnt = units.GetLength(0);
                 if (0 > Pos.x - v.x) dir = 1;
 
-                for(int i = 0; i < cnt; i ++)
+                for (int i = 0; i < cnt; i++)
                 {
                     Vector2Int del = new Vector2Int(v.x + (i * dir), v.y);
                     ret.Remove(del);
@@ -129,7 +132,41 @@ public class UnitController : MonoBehaviour
 
             }
 
+        }//ポーンは相手がルークならいけないようにする。
+       /* else if (TYPE.PAWN == Type)
+        {
+            ret = getMovableTiles(units, TYPE.PAWN);
+
+            // 相手の移動範囲を考慮しない
+            if (!checkking) return ret;
+
+            // 削除対象のタイル
+            List<Vector2Int> removetiles = new List<Vector2Int>();
+
+            // 敵の移動可能範囲にはいけないようにする
+            foreach (var v in ret)
+            {
+                // 移動した状態を作る
+                UnitController[,] copyunits2 = GameSceneDirector.GetCopyArray(units);
+                copyunits2[Pos.x, Pos.y] = null;
+                
+
+                int checkcount = GameSceneDirector.GetCUnits(copyunits2, Player, false).Count;
+
+                if (0 < checkcount) removetiles.Add(v);
+            }
+
+            // ↑で取得した敵の移動可能範囲とかぶるタイルを削除する
+            foreach (var v in removetiles)
+            {
+                ret.Remove(v);
+
+                
+
+            }
+
         }
+       */
         else
         {
             ret = getMovableTiles(units, Type);
@@ -137,6 +174,9 @@ public class UnitController : MonoBehaviour
         
         return ret;
     }
+
+
+    
 
     // 移動可能範囲を返す（プレーンな状態）
     List<Vector2Int> getMovableTiles(UnitController[,] units, TYPE type)
@@ -165,7 +205,7 @@ public class UnitController : MonoBehaviour
             foreach (var v in vec)
             {
                 Vector2Int checkpos = Pos + v;
-                if (!isCheckable(units, checkpos)) continue;
+                if (!isCheckable(units, checkpos)) continue; //端っこまで行ったらその先は行けないようにする。
 
                 // 同じプレイヤーの場所へは行けない
                 if (null != units[checkpos.x, checkpos.y]
@@ -174,13 +214,47 @@ public class UnitController : MonoBehaviour
                     continue;
                 }
 
-                // 貴族には行けない。
-                
+                // 貴族のタグ相手なら行けないようにしたい。
+                //そうするためには、まず相手の情報だけを条件式に入れないといけないくて。
+                //相手の情報というのは、ゲームシーンのプログラムで採用されており、こちらで処理ができない。
+                //定義したコードの呼び出しが出来ればいいのだが。てか、このスクリプトがどこに格納されているのかもわからん。
+                //このコードはまず、自分と相手が等しい場合に出てくるコードなので。
+                //この場で相手を取得できるコードはない。
+                //これの一番、引っかかるポイントは行動範囲が、マスで制御されていて、そのマスがどれぐらい勧めるのかで勧めないのかで制御している。
+                //自分が相手に対して何もできないようにしないとダメ。
+                //相手の能力というかタグを確認するためには。
+
+                // ルーク（貴族）に行けないようにする。
+                //if(自分が、自分のポジションかつ味方の駒がある場合。)動けなくなる。
+                /*if (null != units[checkpos.x, checkpos.y]
+                     && Player != units[checkpos.x, checkpos.y].Player && TYPE.ROOK == Type)
+                 {
+                     Debug.Log("反応している");
+                     continue;
+                 }*/
+
+                if (null != units[checkpos.x, checkpos.y])
+                {
+                    if (Player != units[checkpos.x, checkpos.y].Player)
+                    {
+                        Debug.Log("反応している");
+
+                        if (TYPE.ROOK == units[checkpos.x, checkpos.y].Type)
+                        {
+
+                            Debug.Log("反応している");
+                            continue;
+                        }
+                        
+
+
+                    }
+                }
                 
                 
 
 
-                
+
 
                 ret.Add(checkpos);
             }
@@ -237,18 +311,25 @@ public class UnitController : MonoBehaviour
                     continue;
                 }
 
-                // 王には行けない。
-                if (null != units[checkpos.x, checkpos.y]
-                    || gameObject.tag == "king")
+                if (null != units[checkpos.x, checkpos.y])
                 {
-
-                    if (gameObject.tag == "king")
+                    if (Player != units[checkpos.x, checkpos.y].Player)
                     {
-                        continue;
+                        Debug.Log("反応している");
+
+                        if (TYPE.KING == units[checkpos.x, checkpos.y].Type)
+                        {
+
+                            Debug.Log("反応している");
+                            continue;
+                        }
+
+
+
                     }
-
-
                 }
+
+
 
 
                 ret.Add(checkpos);
@@ -292,16 +373,25 @@ public class UnitController : MonoBehaviour
                     continue;
                 }
 
-                // 貴族には行けない。
-                if (null != units[checkpos.x, checkpos.y]
-                    && gameObject.tag == "heiminn")
+                if (null != units[checkpos.x, checkpos.y])
                 {
+                    if (Player != units[checkpos.x, checkpos.y].Player)
+                    {
+                        Debug.Log("反応している");
 
-                    
-                        continue;
-                    
+                        if (TYPE.PAWN == units[checkpos.x, checkpos.y].Type)
+                        {
 
+                            Debug.Log("反応している");
+                            continue;
+                        }
+
+
+
+                    }
                 }
+
+
 
                 ret.Add(checkpos);
             }
@@ -396,6 +486,9 @@ public class UnitController : MonoBehaviour
         return true;
     }
 
+    
+
+
     // 選択時の処理
     public void SelectUnit(bool select = true)
     {
@@ -451,6 +544,8 @@ public class UnitController : MonoBehaviour
                 Status.Add(STATUS.QSIDE_CASTLING);
             }
         }
+
+        
 
 
 
