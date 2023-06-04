@@ -35,6 +35,7 @@ public class GameSceneDirector : MonoBehaviour
     public List<GameObject> prefabWhiteUnits;
     public List<GameObject> prefabBlackUnits;
 
+    public static List<Player_data> Players = new List<Player_data>();
 
 
     // 1 = ポーン(平民) 2 = ルーク（貴族） 3 = ナイト（英雄） 4 = ビショップ 5 = クイーン 6 = キング（王様）
@@ -175,14 +176,9 @@ public class GameSceneDirector : MonoBehaviour
             }
         }
 
-        nowPlayer = -1;
+        nowPlayer = 1;
         nowMode = MODE.NONE;
         nextMode = MODE.TURN_CHANGE;
-
-
-       
-
-
     }
 
     // Update is called once per frame
@@ -432,11 +428,11 @@ public class GameSceneDirector : MonoBehaviour
 
                 
                 
-                moveUnit(selectUnit, tilepos);
+            moveUnit(selectUnit, tilepos);
 
 
-
-            //nextMode = MODE.STATUS_UPDATE;
+            // コメントアウトで連続行動
+            nextMode = MODE.STATUS_UPDATE;
 
             
 
@@ -463,7 +459,7 @@ public class GameSceneDirector : MonoBehaviour
     // 移動後の処理
    void statusUpdateMode()
     {
-        // キャスリング
+        // キャスリング（特殊能力の処理）
         if(selectUnit.Status.Contains(UnitController.STATUS.QSIDE_CASTLING) )
         {
             // 左端のルーク

@@ -100,6 +100,8 @@ public class TitleSceneDirector : MonoBehaviour
     public void PvE()
     {
         PlayerCount = 1;
+        Player_data P1 = new Player_data(1, "Player");
+        Player_data COM1 = new Player_data(2, "COM");
         SceneManager.LoadScene("SampleScene");
     }
 
