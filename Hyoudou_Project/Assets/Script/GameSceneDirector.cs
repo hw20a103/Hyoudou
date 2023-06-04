@@ -470,11 +470,7 @@ public class GameSceneDirector : MonoBehaviour
 
 
 
-        // ターン経過
-        foreach (var v in getUnits(nowPlayer))
-        {
-            v.ProgressTurn();
-        }
+        
 
         // カーソル
         setSelectCursors();
